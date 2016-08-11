@@ -1,5 +1,5 @@
 /**
- * mlpushmenu.css v2.2.1
+ * mlpushmenu.css v2.3.0
  *
  * Licensed under the MIT license.
  * http://www.opensource.org/licenses/mit-license.php
@@ -17,6 +17,11 @@
 .canvas-container,
 .canvas-container .page-container {
 	height: 100%;
+}
+
+.canvas-container {
+    overflow: hidden;
+    position: relative;;
 }
 
 .mp-pusher {
