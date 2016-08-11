@@ -1,5 +1,5 @@
 /**
- * mlpushmenu.js v2.0.0
+ * mlpushmenu.js v2.0.1
  * http://www.codrops.com
  *
  * Licensed under the MIT license.
