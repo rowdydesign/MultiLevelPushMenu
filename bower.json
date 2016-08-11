@@ -1,0 +1,34 @@
+{
+  "name": "mlpushmenu",
+  "homepage": "https://github.com/rowdydesign/MultiLevelPushMenu",
+  "authors": [
+    "codrops",
+    "Bret Mette <bret.mette@rowdydesign.com>"
+  ],
+  "description": "An experimental push menu with multi-level functionality that allows endless nesting of navigation elements.",
+  "moduleType": "globals",
+  "main": [
+    "css/component.css",
+    "js/mlpushmenu.js"
+  ],
+  "keywords": [
+    "mlpushmenu",
+    "menu",
+    "off-canvas"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "lib",
+    "tasks",
+    "templates",
+    "test",
+    "*.gemspec",
+    "Rakefile",
+    "Gemfile",
+    "*.html"
+  ],
+  "dependencies": {
+  },
+  "version": "1.0.0"
+}
