@@ -1,5 +1,5 @@
 /**
- * mlpushmenu.js v2.2.0
+ * mlpushmenu.js v2.2.1
  *
  * Licensed under the MIT license.
  * http://www.opensource.org/licenses/mit-license.php
