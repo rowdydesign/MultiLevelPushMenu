@@ -29,7 +29,8 @@
     "*.html"
   ],
   "dependencies": {
-    "jquery": "1.9.1 - 3"
+    "jquery": "1.9.1 - 3",
+    "modernizr": "^2.8.3"
   },
   "version": "2.1.0"
 }
