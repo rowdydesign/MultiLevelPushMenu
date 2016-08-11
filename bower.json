@@ -8,7 +8,7 @@
   "description": "An experimental push menu with multi-level functionality that allows endless nesting of navigation elements.",
   "moduleType": "globals",
   "main": [
-    "css/component.css",
+    "css/mlpushmenu.css",
     "js/mlpushmenu.js"
   ],
   "keywords": [
@@ -31,5 +31,5 @@
   "dependencies": {
     "jquery": "1.9.1 - 3"
   },
-  "version": "2.0.1"
+  "version": "2.1.0"
 }
