@@ -29,6 +29,7 @@
     "*.html"
   ],
   "dependencies": {
+    "jquery": "1.9.1 - 3"
   },
   "version": "2.0.0"
 }
