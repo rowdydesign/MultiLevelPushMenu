@@ -1,5 +1,5 @@
 /**
- * mlpushmenu.js v1.0.0
+ * mlpushmenu.js v1.1.0
  * http://www.codrops.com
  *
  * Licensed under the MIT license.
@@ -79,8 +79,16 @@
 			backClass : 'mp-back'
 		},
 		_init : function() {
+		    // context
+		    this.context = this.options.context;
+		    // push elements
+		    this.pushElements = this.options.pushElements;
 			// if menu is open or not
 			this.open = false;
+            // onOpen callback
+            this.onOpen = this.options.onOpen;
+            // onClose callback
+            this.onClose = this.options.onClose;
 			// level depth
 			this.level = 0;
 			// the moving wrapper
@@ -119,6 +127,13 @@
 				}
 				else {
 					self._openMenu();
+
+					if (typeof self.startingMenu !== 'undefined' && self.startingMenu !== null && self.startingMenu.getAttribute('data-level') > 0) {
+                        // indent level 1
+                        classie.add( closest( self.startingMenu.parentNode, 'mp-level' ), 'mp-level-overlay' );
+
+                        self._openMenu(self.startingMenu);
+                    }
 					// the menu should close if clicking somewhere on the body (excluding clicks on the menu)
 					document.addEventListener( self.eventtype, function( ev ) {
 						if( self.open && !hasParent( ev.target, self.el.id ) ) {
@@ -134,16 +149,37 @@
 				var subLevel = el.querySelector( 'div.mp-level' );
 				if( subLevel ) {
 					el.querySelector( 'a' ).addEventListener( self.eventtype, function( ev ) {
-						ev.preventDefault();
-						var level = closest( el, 'mp-level' ).getAttribute( 'data-level' );
-						if( self.level <= level ) {
-							ev.stopPropagation();
-							classie.add( closest( el, 'mp-level' ), 'mp-level-overlay' );
-							self._openMenu( subLevel );
-						}
-					} );
-				}
+                        var level = closest( el, 'mp-level' ).getAttribute( 'data-level' );
+                        if( self.level <= level ) {
+                            ev.preventDefault();
+                            ev.stopPropagation();
+                            classie.add( closest( el, 'mp-level' ), 'mp-level-overlay' );
+                            self._openMenu( subLevel );
+                        }
+					});
+                }
 			} );
+
+			this.menuItems.forEach( function( el, i ) {
+			    var links = el.querySelectorAll( 'a' );
+
+			    for (var i = 0; i < links.length; i++) {
+			        if ( links[i].getAttribute('href').indexOf('#') === 0 && links[i].getAttribute('href') !== '#' ) {
+			            links[i].addEventListener( self.eventtype, function( ev ) {
+			                // reset menu
+                            self._resetMenu();
+
+                            var target = this.hash;
+
+                            if (typeof target !== 'undefined' && target.length) {
+                                console.log(target);
+                                ev.preventDefault();
+                                smoothScroll.animateScroll(null, target);
+                            }
+                        });
+                    }
+                }
+            });
 
 			// closing the sub levels :
 			// by clicking on the visible part of the level element
@@ -169,7 +205,21 @@
 						self.level === 0 ? self._resetMenu() : self._closeMenu();
 					}
 				} );
-			} );	
+			} );
+
+			var startingMenu = null;
+
+            var sectionName = $(this.el).data('current-section');
+
+            if (typeof sectionName !== 'undefined' && sectionName.length > 0) {
+                $(this.el).find('a').each(function(index, el) {
+                    if ($(el).data('section') === sectionName) {
+                        startingMenu = closest(el, 'mp-level');
+                    }
+                });
+
+                self.startingMenu = startingMenu;
+            }
 		},
 		_openMenu : function( subLevel ) {
 			// increment level depth
@@ -178,7 +228,7 @@
 			// move the main wrapper
 			var levelFactor = ( this.level - 1 ) * this.options.levelSpacing,
 				translateVal = this.options.type === 'overlap' ? this.el.offsetWidth + levelFactor : this.el.offsetWidth;
-			
+
 			this._setTransform( 'translate3d(' + translateVal + 'px,0,0)' );
 
 			if( subLevel ) {
@@ -191,12 +241,17 @@
 						this._setTransform( 'translate3d(-100%,0,0) translate3d(' + -1*levelFactor + 'px,0,0)', levelEl );
 					}
 				}
-			}
+            }
 			// add class mp-pushed to main wrapper if opening the first time
 			if( this.level === 1 ) {
 				classie.add( this.wrapper, 'mp-pushed' );
 				this.open = true;
 			}
+
+            if (typeof this.onOpen !== 'undefined') {
+                this.onOpen();
+            }
+
 			// add class mp-level-open to the opening level element
 			classie.add( subLevel || this.levels[0], 'mp-level-open' );
 		},
@@ -208,6 +263,10 @@
 			classie.remove( this.wrapper, 'mp-pushed' );
 			this._toggleLevels();
 			this.open = false;
+
+            if (typeof this.onClose !== 'undefined') {
+                this.onClose();
+            }
 		},
 		// close sub menus
 		_closeMenu : function() {
@@ -217,6 +276,20 @@
 		},
 		// translate the el
 		_setTransform : function( val, el ) {
+		    if (el === undefined && this.pushElements !== undefined && this.pushElements !== null) {
+		        if (!isArray(this.pushElements)) {
+		            this.pushElements = [this.pushElements];
+                }
+
+                for (var i = 0; i < this.pushElements.length; i++) {
+                    if (this.pushElements[i] !== null && this.pushElements[i] !== undefined) {
+                        this.pushElements[i].style.WebkitTransform = val;
+                        this.pushElements[i].style.MozTransform = val;
+                        this.pushElements[i].style.transform = val;
+                    }
+                }
+            }
+
 			el = el || this.wrapper;
 			el.style.WebkitTransform = val;
 			el.style.MozTransform = val;
