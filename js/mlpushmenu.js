@@ -1,16 +1,16 @@
 /**
- * mlpushmenu.js v2.1.0
+ * mlpushmenu.js v2.2.0
  *
  * Licensed under the MIT license.
  * http://www.opensource.org/licenses/mit-license.php
- * 
+ *
  */
 ;( function( window ) {
-	
+
 	'use strict';
 
 	function extend( a, b ) {
-		for( var key in b ) { 
+		for( var key in b ) {
 			if( b.hasOwnProperty( key ) ) {
 				a[key] = b[key];
 			}
@@ -54,7 +54,7 @@
 		return e.parentNode && closest( e.parentNode, classname );
 	}
 
-	function mlPushMenu( el, trigger, options ) {	
+	function mlPushMenu( el, trigger, options ) {
 		this.el = el;
 		this.trigger = trigger;
 		this.options = extend( this.defaults, options );

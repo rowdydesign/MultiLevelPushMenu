@@ -1,11 +1,11 @@
 /**
- * mlpushmenu.css v2.1.0
+ * mlpushmenu.css v2.2.0
  *
  * Licensed under the MIT license.
  * http://www.opensource.org/licenses/mit-license.php
- * 
+ *
  */
- 
+
 *,
 *:after,
 *::before {
@@ -14,7 +14,7 @@
     box-sizing: border-box;
 }
 
-.canvas-container, 
+.canvas-container,
 .canvas-container .page-container {
 	height: 100%;
 }
