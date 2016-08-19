@@ -1,5 +1,5 @@
 /**
- * mlpushmenu.css v2.2.0
+ * mlpushmenu.css v2.3.1
  *
  * Licensed under the MIT license.
  * http://www.opensource.org/licenses/mit-license.php
@@ -17,6 +17,11 @@
 .canvas-container,
 .canvas-container .page-container {
 	height: 100%;
+}
+
+.canvas-container {
+    overflow: hidden;
+    position: relative;;
 }
 
 .mp-pusher {
@@ -44,86 +49,10 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: $downriver;
+    background: transparent;
     -webkit-transform: translate3d(-100%, 0, 0);
     -moz-transform: translate3d(-100%, 0, 0);
     transform: translate3d(-100%, 0, 0);
-}
-
-/* overlays for pusher and for level that gets covered */
-.mp-pusher::after,
-.mp-level::after,
-.mp-level::before {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 0;
-    height: 0;
-    content: '';
-    opacity: 0;
-}
-
-.mp-pusher::after,
-.mp-level::after {
-    background: rgba(0,0,0,0.3);
-    -webkit-transition: opacity 0.3s, width 0.1s 0.3s, height 0.1s 0.3s;
-    -moz-transition: opacity 0.3s, width 0.1s 0.3s, height 0.1s 0.3s;
-    transition: opacity 0.3s, width 0.1s 0.3s, height 0.1s 0.3s;
-}
-
-.mp-level::after {
-    z-index: -1;
-}
-
-.mp-pusher.mp-pushed::after,
-.mp-level.mp-level-overlay::after {
-    width: 100%;
-    height: 100%;
-    opacity: 1;
-    -webkit-transition: opacity 0.3s;
-    -moz-transition: opacity 0.3s;
-    transition: opacity 0.3s;
-}
-
-.mp-level.mp-level-overlay {
-    cursor: pointer;
-}
-
-.mp-level.mp-level-overlay.mp-level::before {
-    width: 100%;
-    height: 100%;
-    background: transparent;
-    opacity: 1;
-}
-
-#hover-navigation {
-    -webkit-transition: -webkit-transform 0.5s;
-    -moz-transition: -moz-transform 0.5s;
-    transition: transform 0.5s;
-}
-
-#off-canvas-brand-curtain,
-#trigger-container,
-#page-container,
-.mp-pusher,
-.mp-level {
-    -webkit-transition: all 0.5s;
-    -moz-transition: all 0.5s;
-    transition: all 0.5s;
-}
-
-.mp-level-overlay {
-    > ul {
-        .mp-level-open {
-            height: 100%;
-
-            > ul {
-                height: 100%;
-                position: relative;
-                padding-bottom: 300px;
-            }
-        }
-    }
 }
 
 /* overlap */
@@ -156,137 +85,6 @@
     -webkit-transform: translate3d(-100%, 0, 0);
     -moz-transform: translate3d(-100%, 0, 0);
     transform: translate3d(-100%, 0, 0);
-}
-
-/* content style */
-.mp-menu ul {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-}
-
-.mp-menu ul li {
-    margin-bottom: 0;
-}
-
-.mp-menu h2 {
-    margin: 0;
-    padding: 1.5rem 2rem;
-    color: $soft-white-85;
-    font-size: 1.25rem;
-    text-shadow: 0 0 1px rgba(255,255,255,0.1);
-    font-weight: 300;
-}
-
-.mp-menu.mp-overlap h2::before {
-    position: absolute;
-    top: 3px;
-    right: 0;
-    margin-right: 8px;
-    line-height: 1.8;
-    opacity: 0;
-    -webkit-transition: opacity 0.3s, -webkit-transform 0.1s 0.3s;
-    -moz-transition: opacity 0.3s, -moz-transform 0.1s 0.3s;
-    transition: opacity 0.3s, transform 0.1s 0.3s;
-    -webkit-transform: translateX(-100%);
-    -moz-transform: translateX(-100%);
-    transform: translateX(-100%);
-}
-
-.mp-menu.mp-cover h2 {
-    text-transform: uppercase;
-    font-weight: 700;
-}
-
-.mp-overlap .mp-level.mp-level-overlay > h2::before {
-    opacity: 1;
-    -webkit-transition: -webkit-transform 0.3s, opacity 0.3s;
-    -moz-transition: -moz-transform 0.3s, opacity 0.3s;
-    transition: transform 0.3s, opacity 0.3s;
-    -webkit-transform: translateX(0);
-    -moz-transform: translateX(0);
-    transform: translateX(0);
-}
-
-.mp-menu ul li > a {
-    color: $soft-white-85;
-    border-left: 3px solid transparent;
-    display: block;
-    padding: 0.75rem 2rem;
-    font-size: 0.85rem;
-    outline: none;
-    text-shadow: 0 0 1px rgba(255,255,255,0.1);
-    -webkit-transition: all 0.3s;
-    -moz-transition: all 0.3s;
-    transition: all 0.3s;
-}
-
-.mp-menu ul li.active > a,
-.mp-menu ul li > a:hover {
-    color: $flight-services-blue;
-    text-decoration: none;
-}
-
-.mp-menu ul li.active > a {
-    background: rgba(0,0,0,0.2);
-    border-left: 3px solid $flight-services-blue;
-}
-
-.mp-menu ul li::before {
-    position: absolute;
-    left: 10px;
-    z-index: -1;
-    color: rgba(0,0,0,0.2);
-    line-height: 3.5;
-}
-
-.mp-level > ul > li:first-child > a {
-}
-
-.mp-menu .mp-level.mp-level-overlay > ul > li > a,
-.mp-level.mp-level-overlay > ul > li:first-child > a {
-}
-
-.mp-level > ul > li:first-child > a:hover,
-.mp-level.mp-level-overlay > ul > li:first-child > a {
-} /* seems like Chrome 34.0.1847.131 needs the second shadow otherwise the transition breaks */
-
-.mp-back {
-    outline: none;
-    color: $soft-white-85;
-    text-transform: uppercase;
-    font-weight: 400;
-    display: block;
-    padding: 1rem 1rem;
-    position: relative;
-    border-top: 1px solid $soft-white-25;
-    border-bottom: 1px solid $soft-white-25;
-    -webkit-transition: background 0.3s;
-    -moz-transition: background 0.3s;
-    transition: background 0.3s;
-}
-
-.mp-back:hover {
-    background: transparent;
-    color: $soft-white-85;
-    text-decoration: none;
-}
-
-.mp-back::after {
-    font-family: 'FontAwesome';
-    font-style: normal;
-    font-weight: normal;
-    position: absolute;
-    content: "\f0da";
-    right: 10px;
-    color: $soft-white-85;
-}
-
-.mp-menu .mp-level.mp-level-overlay > .mp-back,
-.mp-menu .mp-level.mp-level-overlay > .mp-back::after {
-    background: transparent;
-    box-shadow: none;
-    color: transparent;
 }
 
 /* Fallback example for browsers that don't support 3D transforms (and no JS fallback) */
