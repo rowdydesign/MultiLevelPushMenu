@@ -1,11 +1,11 @@
 /**
- * mlpushmenu.js v2.3.1
+ * mlpushmenu.js v3.0.0
  *
  * Licensed under the MIT license.
  * http://www.opensource.org/licenses/mit-license.php
  *
  */
-;( function( window ) {
+;( function( document, window, undefined ) {
 
 	'use strict';
 
@@ -32,7 +32,7 @@
 	// for this calculation only parents with classname = waypoint are considered
 	function getLevelDepth( e, id, waypoint, cnt ) {
 		cnt = cnt || 0;
-		if ( e.id !== undefined && e.id.indexOf( id ) >= 0 ) return cnt;
+		if ( $(e).prop('id').indexOf( id ) >= 0 ) return cnt;
 		if( $(e).hasClass( waypoint ) ) {
 			++cnt;
 		}
@@ -71,7 +71,7 @@
 			// cover: the open levels will be on top of any previous open level
 			type : 'overlap', // overlap || cover
 			// space between each overlaped level
-			levelSpacing : 40,
+			levelSpacing : 300,
 			// classname for the element (if any) that when clicked closes the current level
 			backClass : 'mp-back'
 		},
@@ -82,10 +82,6 @@
 		    this.pushElements = this.options.pushElements;
 			// if menu is open or not
 			this.open = false;
-            // onOpen callback
-            this.onOpen = this.options.onOpen;
-            // onClose callback
-            this.onClose = this.options.onClose;
 			// level depth
 			this.level = 0;
 			// the moving wrapper
@@ -94,7 +90,9 @@
 			this.levels = Array.prototype.slice.call( $(this.el).find( 'div.mp-level' ) );
 			// save the depth of each of these mp-level elements
 			var self = this;
-			this.levels.forEach( function( el, i ) { el.setAttribute( 'data-level', getLevelDepth( el, self.el.id, 'mp-level' ) ); } );
+			this.levels.forEach( function( el, i ) {
+				el.setAttribute( 'data-level', getLevelDepth( el, $(self.el).prop('id'), 'mp-level' ) );
+			});
 			// the menu items
 			this.menuItems = Array.prototype.slice.call( $(this.el).find( 'li' ) );
 			// if type == "cover" these will serve as hooks to move back to the previous level
@@ -119,18 +117,13 @@
 			$(this.trigger).bind( this.eventtype, function( ev ) {
 				ev.stopPropagation();
 				ev.preventDefault();
+
 				if( self.open ) {
 					self._resetMenu();
 				}
 				else {
 					self._openMenu();
 
-					if (typeof self.startingMenu !== 'undefined' && self.startingMenu !== null && self.startingMenu.getAttribute('data-level') > 0) {
-                        // indent level 1
-                        $(self.startingMenu.parentNode).addClass( closest( 'mp-level' ), 'mp-level-overlay' );
-
-                        self._openMenu(self.startingMenu);
-                    }
 					// the menu should close if clicking somewhere on the body (excluding clicks on the menu)
 					$(document).bind( self.eventtype, function( ev ) {
 						if( self.open && !hasParent( ev.target, self.el.id ) ) {
@@ -151,8 +144,14 @@
                             ev.preventDefault();
                             ev.stopPropagation();
                             $(el).addClass( closest( 'mp-level' ), 'mp-level-overlay' );
+							$(el).addClass('mp-open-child');
                             self._openMenu( subLevel );
-                        }
+
+							$(document.body).trigger('mp-child-is-opening', [$(self.el), $(el)]);
+                        } else {
+							$(el).removeClass('mp-open-child');
+							$(document.body).trigger('mp-child-is-closing', [$(self.el), $(el)]);
+						}
 					});
                 }
 			} );
@@ -169,7 +168,6 @@
                             var target = this.hash;
 
                             if (typeof target !== 'undefined' && target.length) {
-                                console.log(target);
                                 ev.preventDefault();
                                 smoothScroll.animateScroll(null, target);
                             }
@@ -181,6 +179,9 @@
 			// closing the sub levels :
 			// by clicking on the visible part of the level element
 			this.levels.forEach( function( el, i ) {
+				var translateVal = ($(el).data('level') - 1) * self.options.levelSpacing;
+				self._pushElement($(el), translateVal);
+
 				$(el).bind( self.eventtype, function( ev ) {
 					ev.stopPropagation();
 					var level = el.getAttribute( 'data-level' );
@@ -204,110 +205,110 @@
 				} );
 			} );
 
-			var startingMenu = null;
+			// transform the root element for consistency
+			this._pushElement($(this.el), 0);
 
-            var sectionName = $(this.el).data('current-section');
+			$(document.body).trigger('mp-initialized', [$(this.el)]);
+		},
+		_openRootLevel : function () {
+			var $rootLevel = $(this.el);
 
-            if (typeof sectionName !== 'undefined' && sectionName.length > 0) {
-                $(this.el).find('a').each(function(index, el) {
-                    if ($(el).data('section') === sectionName) {
-                        startingMenu = closest(el, 'mp-level');
-                    }
-                });
+			// we should not need to push the root level menu.
+			var translateVal = 0;
 
-                self.startingMenu = startingMenu;
-            }
+			// push the root menu element
+			this._pushElement($rootLevel, translateVal);
+
+			$(this.wrapper).addClass('mp-pushed');
+			this.open = true;
+		},
+		_getRootLevelWidth : function() {
+			var rootLevelWidth = 0;
+
+			return rootLevelWidth;
+		},
+		_getExpandedMenusWidth : function() {
+			return Number(this.level) * Number(this.options.levelSpacing);
+		},
+		_getMenuWidth : function() {
+			var menuWidth = Number(this._getRootLevelWidth() + this._getExpandedMenusWidth());
+
+			return menuWidth;
+		},
+		_transformAllPushElements : function() {
+			var translateVal = (this.open) ? this._getMenuWidth() : 0;
+
+			// push any other push elements
+			if (!$.isArray(this.pushElements)) {
+				this.pushElements = [this.pushElements];
+			}
+
+			for (var i = 0; i < this.pushElements.length; i++) {
+				if (this.pushElements[i] !== null && this.pushElements[i] !== undefined) {
+					this._pushElement($(this.pushElements[i]), translateVal);
+				}
+			}
+		},
+		_resetElementTransform : function($el) {
+			this._transformElement( $el, '' );
+		},
+		_pushElement : function($el, xVal) {
+			$el = $($el);
+			this._transformElement($el, 'translate3d(' + xVal + 'px, 0, 0)');
 		},
 		_openMenu : function( subLevel ) {
 			// increment level depth
 			++this.level;
 
-			// move the main wrapper
-			var levelFactor = ( this.level - 1 ) * this.options.levelSpacing,
-				translateVal = this.options.type === 'overlap' ? $(this.el).outerWidth() + levelFactor : $(this.el).outerWidth();
-
-			this._setTransform( 'translate3d(' + translateVal + 'px,0,0)' );
-
-			if( subLevel ) {
-				// reset transform for sublevel
-				this._setTransform( '', subLevel );
-				// need to reset the translate value for the level menus that have the same level depth and are not open
-				for( var i = 0, len = this.levels.length; i < len; ++i ) {
-					var levelEl = this.levels[i];
-					if( levelEl != subLevel && !$(levelEl).hasClass( 'mp-level-open' ) ) {
-						this._setTransform( 'translate3d(-100%,0,0) translate3d(' + -1*levelFactor + 'px,0,0)', levelEl );
-					}
-				}
-            }
-			// add class mp-pushed to main wrapper if opening the first time
-			if( this.level === 1 ) {
-				$(this.wrapper).addClass( 'mp-pushed' );
-				this.open = true;
+			if (!this.open) {
+				this._openRootLevel();
 			}
 
-            if (typeof this.onOpen !== 'undefined') {
-                this.onOpen();
-            }
+			this._transformAllPushElements();
 
 			// add class mp-level-open to the opening level element
 			$(subLevel || this.levels[0]).addClass( 'mp-level-open' );
 		},
 		// close the menu
 		_resetMenu : function() {
-			this._setTransform('translate3d(0,0,0)');
 			this.level = 0;
+
+			this._collapseLevels();
+
 			// remove class mp-pushed from main wrapper
 			$(this.wrapper).removeClass( 'mp-pushed' );
-			this._toggleLevels();
 			this.open = false;
-
-            if (typeof this.onClose !== 'undefined') {
-                this.onClose();
-            }
 		},
 		// close sub menus
 		_closeMenu : function() {
-			var translateVal = this.options.type === 'overlap' ? $(this.el).outerWidth() + ( this.level - 1 ) * this.options.levelSpacing : $(this.el).outerWidth();
-			this._setTransform( 'translate3d(' + translateVal + 'px,0,0)' );
-			this._toggleLevels();
+			this._collapseLevels();
 		},
-		// translate the el
-		_setTransform : function( val, el ) {
-		    if (el === undefined && this.pushElements !== undefined && this.pushElements !== null) {
-		        if (!$.isArray(this.pushElements)) {
-		            this.pushElements = [this.pushElements];
-                }
+		_transformElement : function( $el, val ) {
+			$el = $($el);
 
-                for (var i = 0; i < this.pushElements.length; i++) {
-                    if (this.pushElements[i] !== null && this.pushElements[i] !== undefined) {
-                        $(this.pushElements[i]).css('-webkit-transform', val);
-                        $(this.pushElements[i]).css('-moz-transform', val);
-                        $(this.pushElements[i]).css('transform', val);
-                    }
-                }
-            }
-
-			el = el || this.wrapper;
-			$(el).css('-webkit-transform', val);
-			$(el).css('-moz-transform' , val);
-			$(el).css('transform', val);
+			$el.css('-webkit-transform', val);
+			$el.css('-moz-transform' , val);
+			$el.css('transform', val);
 		},
-		// removes classes mp-level-open from closing levels
-		_toggleLevels : function() {
+		_collapseLevels : function() {
 			for( var i = 0, len = this.levels.length; i < len; ++i ) {
 				var levelEl = this.levels[i];
-				if( levelEl.getAttribute( 'data-level' ) >= this.level + 1 ) {
+				if( Number(levelEl.getAttribute( 'data-level' )) >= this.level + 1 ) {
 					$(levelEl).removeClass( 'mp-level-open' );
 					$(levelEl).removeClass( 'mp-level-overlay' );
+					$(levelEl).closest('li').removeClass('mp-open-child');
 				}
 				else if( Number( levelEl.getAttribute( 'data-level' ) ) == this.level ) {
 					$(levelEl).removeClass( 'mp-level-overlay' );
+					$(levelEl).closest('li').removeClass('mp-open-child');
 				}
 			}
+
+			this._transformAllPushElements();
 		}
 	}
 
 	// add to global namespace
 	window.mlPushMenu = mlPushMenu;
 
-} )( window );
+} )( document, window );

@@ -1,5 +1,5 @@
 /**
- * mlpushmenu.css v2.3.1
+ * mlpushmenu.css v3.0.0
  *
  * Licensed under the MIT license.
  * http://www.opensource.org/licenses/mit-license.php
@@ -58,9 +58,6 @@
 /* overlap */
 .mp-overlap .mp-level.mp-level-open {
     box-shadow: 1px 0 2px rgba(0,0,0,0.2);
-    -webkit-transform: translate3d(-40px, 0, 0);
-    -moz-transform: translate3d(-40px, 0, 0);
-    transform: translate3d(-40px, 0, 0);
 }
 
 /* First level */
