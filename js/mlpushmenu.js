@@ -1,5 +1,5 @@
 /**
- * mlpushmenu.js v3.0.0
+ * mlpushmenu.js v3.1.0
  *
  * Licensed under the MIT license.
  * http://www.opensource.org/licenses/mit-license.php
@@ -124,7 +124,8 @@
 				else {
 					self._openMenu();
 
-					// the menu should close if clicking somewhere on the body (excluding clicks on the menu)
+					// the menu should close if clicking somewhere on the body
+					// (excluding clicks on the menu)
 					$(document).bind( self.eventtype, function( ev ) {
 						if( self.open && !hasParent( ev.target, self.el.id ) ) {
 							bodyClickFn( this );
@@ -139,8 +140,16 @@
 				var subLevel = el.querySelector( 'div.mp-level' );
 				if( subLevel ) {
 					$(el.querySelector( 'a' )).bind( self.eventtype, function( ev ) {
-                        var level = closest( el, 'mp-level' ).getAttribute( 'data-level' );
-                        if( self.level <= level ) {
+						var level = closest( el, 'mp-level' ).getAttribute( 'data-level' );
+
+						if ($(el).find('.mp-level').length > 0) {
+							ev.preventDefault();
+							level = $(el).find('.mp-level')[0].getAttribute( 'data-level' );
+						}
+
+						level = parseInt(level);
+
+                        if( self.level < level ) {
                             ev.preventDefault();
                             ev.stopPropagation();
                             $(el).addClass( closest( 'mp-level' ), 'mp-level-overlay' );
@@ -148,9 +157,15 @@
                             self._openMenu( subLevel );
 
 							$(document.body).trigger('mp-child-is-opening', [$(self.el), $(el)]);
-                        } else {
+                        } else if( self.level > level ) {
 							$(el).removeClass('mp-open-child');
 							$(document.body).trigger('mp-child-is-closing', [$(self.el), $(el)]);
+						} else if( self.level === level ) {
+							ev.stopPropagation();
+							$(el).closest('ul').find('li').removeClass('mp-open-child');
+							$(el).closest('ul').find('.mp-level-open').removeClass('mp-level-open');
+							$(el).addClass('mp-open-child');
+							$(el).find('.mp-level').addClass('mp-level-open');
 						}
 					});
                 }
@@ -296,12 +311,12 @@
 				if( Number(levelEl.getAttribute( 'data-level' )) >= this.level + 1 ) {
 					$(levelEl).removeClass( 'mp-level-open' );
 					$(levelEl).removeClass( 'mp-level-overlay' );
-					$(levelEl).closest('li').removeClass('mp-open-child');
 				}
 				else if( Number( levelEl.getAttribute( 'data-level' ) ) == this.level ) {
 					$(levelEl).removeClass( 'mp-level-overlay' );
-					$(levelEl).closest('li').removeClass('mp-open-child');
 				}
+
+				$(levelEl).closest('ul li').removeClass('mp-open-child');
 			}
 
 			this._transformAllPushElements();
