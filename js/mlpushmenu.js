@@ -1,5 +1,5 @@
 /**
- * mlpushmenu.js v3.1.0
+ * mlpushmenu.js v3.2.0
  *
  * Licensed under the MIT license.
  * http://www.opensource.org/licenses/mit-license.php
@@ -175,17 +175,13 @@
 			    var links = el.querySelectorAll( 'a' );
 
 			    for (var i = 0; i < links.length; i++) {
-			        if ( links[i].getAttribute('href').indexOf('#') === 0 && links[i].getAttribute('href') !== '#' ) {
+			        // if we are on an end code close the menu
+					if ($(el).closest('li').find('.mp-level').length > 0) {
+						//
+					} else {
 			            $(links[i]).bind( self.eventtype, function( ev ) {
 			                // reset menu
                             self._resetMenu();
-
-                            var target = this.hash;
-
-                            if (typeof target !== 'undefined' && target.length) {
-                                ev.preventDefault();
-                                smoothScroll.animateScroll(null, target);
-                            }
                         });
                     }
                 }
@@ -309,7 +305,6 @@
 			for( var i = 0, len = this.levels.length; i < len; ++i ) {
 				var levelEl = this.levels[i];
 				if( Number(levelEl.getAttribute( 'data-level' )) >= this.level + 1 ) {
-					$(levelEl).removeClass( 'mp-level-open' );
 					$(levelEl).removeClass( 'mp-level-overlay' );
 				}
 				else if( Number( levelEl.getAttribute( 'data-level' ) ) == this.level ) {
